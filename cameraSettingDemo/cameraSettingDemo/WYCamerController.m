@@ -9,11 +9,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
-#import "WYViewController.h"
+#import "WYCamerController.h"
 #import "WYAVCameraPreviewView.h"
-
-
-typedef void(^didCapturePictureBlock)(UIImage *stillImage);
 
 //???: 搞不懂这三行是做嘛的！！！！T
 static void * CapturingStillImageContext = &CapturingStillImageContext;
@@ -21,7 +18,7 @@ static void * RecordingContext = &RecordingContext;
 static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDeviceAuthorizedContext;
 
 
-@interface WYViewController ()
+@interface WYCamerController ()
 
 /**输入设备*/
 @property (nonatomic,strong) AVCaptureDeviceInput      *videoDeviceInput;
@@ -51,6 +48,8 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 @property (nonatomic) id runtimeErrorHandlingObserver;
 
+@property (nonatomic,readonly,getter = isSessionRunningAndDeviceAuthorizedContext)BOOL sessionRunningAndDeviceAuthorizedContext;
+
 /**
  *  方法类
  */
@@ -60,7 +59,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 @end
 
-@implementation WYViewController
+@implementation WYCamerController
 
 
 #pragma mark --懒加载
@@ -77,6 +76,8 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     return _connection;
 }
 
+
+
 #pragma mark ---初始化方法
 - (void)viewDidLoad
 {
@@ -86,9 +87,8 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     self.session = session;
     
     self.preview.session = session;
-    
-    
-    // Check for device authorization
+
+    // 检查设备授权状态
 	[self checkDeviceAuthorizationStatus];
     
     self.sessionQueue = dispatch_queue_create("session queue", DISPATCH_QUEUE_SERIAL);
@@ -157,18 +157,28 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 {
     [super viewWillAppear:animated];
     dispatch_async(self.sessionQueue, ^{
-//        [self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized"
-//                               options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
-//                               context:SessionRunningAndDeviceAuthorizedContext];
-//        [self addObserver:self forKeyPath:@"stillImageOut.capturingStillImage"
-//                  options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-//                  context:CapturingStillImageContext];
-//        AVCaptureDevice *device = self.videoDeviceInput.device;
-//        
-//        [[NSNotificationCenter defaultCenter] addObserver:self
-//                                                 selector:@selector(subjectAreaDidChange:)
-//                                                 name:AVCaptureDeviceSubjectAreaDidChangeNotification
-//                                                  object:device];
+        [self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized"
+                               options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                               context:SessionRunningAndDeviceAuthorizedContext];
+        [self addObserver:self forKeyPath:@"stillImageOut.capturingStillImage"
+                  options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+                  context:CapturingStillImageContext];
+        AVCaptureDevice *device = self.videoDeviceInput.device;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(subjectAreaDidChange:)
+                                                 name:AVCaptureDeviceSubjectAreaDidChangeNotification
+                                                  object:device];
+
+        //!!!: 这一段应该是用来记录录像的
+//        __weak typeof(self) weakSelf = self;
+//        [self setRuntimeErrorHandlingObserver:[[NSNotificationCenter defaultCenter] addObserverForName:AVCaptureSessionRuntimeErrorNotification object:self.session queue:nil usingBlock:^(NSNotification *note) {
+//            	WYCamerController *strongSelf = weakSelf;
+//            dispatch_async(strongSelf.sessionQueue, ^{
+//                [strongSelf.session startRunning];
+//                [strongSelf ]
+//            });
+//        }]];
         
         [self.session startRunning];
  
@@ -180,11 +190,23 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     [super viewWillDisappear:animated];
     dispatch_async(self.sessionQueue, ^{
         [self.session stopRunning];
-//        AVCaptureDevice *device = self.videoDeviceInput.device;
-//        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:device];
+        AVCaptureDevice *device = self.videoDeviceInput.device;
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:device];
 //        [[NSNotificationCenter defaultCenter] removeObserver:self.runtimeErrorHandlingObserver];
+        [self removeObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" context:SessionRunningAndDeviceAuthorizedContext];
+        [self removeObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" context:CapturingStillImageContext];
     });
     
+}
+
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (context ==CapturingStillImageContext) {
+        BOOL isCapturingStillImage = [change[NSKeyValueChangeNewKey] boolValue];
+        if (isCapturingStillImage) {
+            [self runStillImageCaptureAnimation];
+        }
+    }
 }
 
 /**
@@ -206,34 +228,12 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     return YES;
 }
 
+#pragma mark--私有方法
 
-/**
- *  检查设备是否授权
- */
-- (void)checkDeviceAuthorizationStatus
+- (BOOL)isSessionRunningAndDeviceAuthorized
 {
-    NSString *mediaType = AVMediaTypeVideo;
-    [AVCaptureDevice requestAccessForMediaType:mediaType completionHandler:^(BOOL granted) {
-        if (granted) {
-            [self setDeviceAuthorized:YES];
-        }else{
-            //	//Not granted access to mediaType
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                [[[UIAlertView alloc] initWithTitle:@"AVM!"
-                                            message:@"AVCam doesn't have permission to use Camera, please change privacy settings"
-                                           delegate:self
-                                           cancelButtonTitle:@"cancel"
-                                           otherButtonTitles:nil] show];
-                [self setDeviceAuthorized:NO];
-                
-            });
-            
-        };
-        
-    }];
+    return [self.session isRunning] && self.deviceAuthorized;
 }
-
 
 /**
  *  设置闪光灯模式
@@ -344,5 +344,48 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         
     });
 }
+
+#pragma mark --UI
+
+/**
+ *  当拍照的时候延缓处理
+ */
+- (void)runStillImageCaptureAnimation
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.preview.layer.opacity = 0.0;
+        [UIView animateWithDuration:.25 animations:^{
+            self.preview.layer.opacity = 1.0;
+        }];
+    });
+}
+
+/**
+ *  检查设备是否授权
+ */
+- (void)checkDeviceAuthorizationStatus
+{
+    NSString *mediaType = AVMediaTypeVideo;
+    [AVCaptureDevice requestAccessForMediaType:mediaType completionHandler:^(BOOL granted) {
+        if (granted) {
+            [self setDeviceAuthorized:YES];
+        }else{
+            //	//Not granted access to mediaType
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                [[[UIAlertView alloc] initWithTitle:@"AVM!"
+                                            message:@"AVCam doesn't have permission to use Camera, please change privacy settings"
+                                           delegate:self
+                                  cancelButtonTitle:@"cancel"
+                                  otherButtonTitles:nil] show];
+                [self setDeviceAuthorized:NO];
+                
+            });
+            
+        };
+        
+    }];
+}
+
 
 @end

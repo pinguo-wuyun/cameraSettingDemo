@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WYViewController : UIViewController
+@interface WYCamerController : UIViewController
 
 @end

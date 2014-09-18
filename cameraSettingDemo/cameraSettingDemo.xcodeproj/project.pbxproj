@@ -15,7 +15,7 @@
 		A4B1DF4F19CA6B85004A3F9C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A4B1DF4E19CA6B85004A3F9C /* main.m */; };
 		A4B1DF5319CA6B85004A3F9C /* WYAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A4B1DF5219CA6B85004A3F9C /* WYAppDelegate.m */; };
 		A4B1DF5619CA6B85004A3F9C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A4B1DF5419CA6B85004A3F9C /* Main.storyboard */; };
-		A4B1DF5919CA6B85004A3F9C /* WYViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A4B1DF5819CA6B85004A3F9C /* WYViewController.m */; };
+		A4B1DF5919CA6B85004A3F9C /* WYCamerController.m in Sources */ = {isa = PBXBuildFile; fileRef = A4B1DF5819CA6B85004A3F9C /* WYCamerController.m */; };
 		A4B1DF5B19CA6B85004A3F9C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4B1DF5A19CA6B85004A3F9C /* Images.xcassets */; };
 		A4B1DF6219CA6B85004A3F9C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF6119CA6B85004A3F9C /* XCTest.framework */; };
 		A4B1DF6319CA6B85004A3F9C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4219CA6B85004A3F9C /* Foundation.framework */; };
@@ -51,8 +51,8 @@
 		A4B1DF5119CA6B85004A3F9C /* WYAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYAppDelegate.h; sourceTree = "<group>"; };
 		A4B1DF5219CA6B85004A3F9C /* WYAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYAppDelegate.m; sourceTree = "<group>"; };
 		A4B1DF5519CA6B85004A3F9C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		A4B1DF5719CA6B85004A3F9C /* WYViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYViewController.h; sourceTree = "<group>"; };
-		A4B1DF5819CA6B85004A3F9C /* WYViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYViewController.m; sourceTree = "<group>"; };
+		A4B1DF5719CA6B85004A3F9C /* WYCamerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYCamerController.h; sourceTree = "<group>"; };
+		A4B1DF5819CA6B85004A3F9C /* WYCamerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYCamerController.m; sourceTree = "<group>"; };
 		A4B1DF5A19CA6B85004A3F9C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A4B1DF6019CA6B85004A3F9C /* cameraSettingDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cameraSettingDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4B1DF6119CA6B85004A3F9C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -130,8 +130,8 @@
 				A4B1DF5119CA6B85004A3F9C /* WYAppDelegate.h */,
 				A4B1DF5219CA6B85004A3F9C /* WYAppDelegate.m */,
 				A4B1DF5419CA6B85004A3F9C /* Main.storyboard */,
-				A4B1DF5719CA6B85004A3F9C /* WYViewController.h */,
-				A4B1DF5819CA6B85004A3F9C /* WYViewController.m */,
+				A4B1DF5719CA6B85004A3F9C /* WYCamerController.h */,
+				A4B1DF5819CA6B85004A3F9C /* WYCamerController.m */,
 				A40AAF7719CA80DB002B8892 /* WYAVCameraPreviewView.h */,
 				A40AAF7819CA80DB002B8892 /* WYAVCameraPreviewView.m */,
 				A4B1DF5A19CA6B85004A3F9C /* Images.xcassets */,
@@ -269,7 +269,7 @@
 			files = (
 				A4B1DF5319CA6B85004A3F9C /* WYAppDelegate.m in Sources */,
 				A4B1DF4F19CA6B85004A3F9C /* main.m in Sources */,
-				A4B1DF5919CA6B85004A3F9C /* WYViewController.m in Sources */,
+				A4B1DF5919CA6B85004A3F9C /* WYCamerController.m in Sources */,
 				A40AAF7919CA80DB002B8892 /* WYAVCameraPreviewView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

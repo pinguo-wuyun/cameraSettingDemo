@@ -15,6 +15,11 @@
 
 typedef void(^didCapturePictureBlock)(UIImage *stillImage);
 
+static void * CapturingStillImageContext = &CapturingStillImageContext;
+static void * RecordingContext = &RecordingContext;
+static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDeviceAuthorizedContext;
+
+
 @interface WYViewController ()
 
 /**输入设备*/
@@ -51,12 +56,6 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
 
 - (IBAction)changeCamera:(UIButton *)sender;
 
-
-
-
-
-
-
 @end
 
 @implementation WYViewController
@@ -68,7 +67,8 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
  */
 - (AVCaptureConnection *)connection
 {
-    if (_connection==nil) {
+    if (_connection==nil)
+    {
       AVCaptureVideoPreviewLayer *previewLayer =(AVCaptureVideoPreviewLayer *)self.preview.layer;
         _connection = previewLayer.connection;
     }
@@ -103,7 +103,8 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
             NSLog(@"error%@",error);
         }
         
-        if ([session canAddInput:vedioDeviceInput]) {
+        if ([session canAddInput:vedioDeviceInput])
+        {
             [session addInput:vedioDeviceInput];
             self.videoDeviceInput = vedioDeviceInput;
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -118,7 +119,8 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
         //设置图像输出,并且添加
         AVCaptureStillImageOutput *stillImageOut = [[AVCaptureStillImageOutput alloc] init];
 
-        if ([session canAddOutput:stillImageOut]) {
+        if ([session canAddOutput:stillImageOut])
+        {
             //设置输出的图片是jpg
             [stillImageOut setOutputSettings:@{AVVideoCodecKey : AVVideoCodecJPEG}];
             [session canAddOutput:stillImageOut];
@@ -135,8 +137,10 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
     NSArray *devices = [AVCaptureDevice devicesWithMediaType:mediaType];
     AVCaptureDevice *captureDevice = [devices firstObject];
     
-    for (AVCaptureDevice *device in devices) {
-        if ( [device position] == postion) {
+    for (AVCaptureDevice *device in devices)
+    {
+        if ( [device position] == postion)
+        {
             
             captureDevice = device;
             break;
@@ -148,13 +152,28 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self.session startRunning];
-}
+    dispatch_async(self.sessionQueue, ^{
+        [self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized"
+                               options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                               context:SessionRunningAndDeviceAuthorizedContext];
+        [self addObserver:self forKeyPath:@"stillImageOut.capturingStillImage"
+                  options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+                  context:CapturingStillImageContext];
+        
+        [self.session startRunning];
+ 
+    });
+   }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [self.session stopRunning];
+    dispatch_async(dispatch_get_main_queue(), ^{
+
+        []
+        [self.session stopRunning];
+    });
+    
 }
 
 /**
@@ -193,8 +212,8 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
                 [[[UIAlertView alloc] initWithTitle:@"AVM!"
                                             message:@"AVCam doesn't have permission to use Camera, please change privacy settings"
                                            delegate:self
-                                  cancelButtonTitle:@"cancel"
-                                  otherButtonTitles:nil] show];
+                                           cancelButtonTitle:@"cancel"
+                                           otherButtonTitles:nil] show];
                 [self setDeviceAuthorized:NO];
                 
             });
@@ -210,11 +229,14 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
  */
 - (void)setFlashModel:(AVCaptureFlashMode)flashMode forDevice:(AVCaptureDevice *)device
 {
-    if ([device hasFlash] && [device isFlashModeSupported:flashMode]) {
+    if ([device hasFlash] && [device isFlashModeSupported:flashMode])
+    {
         NSError *error = nil;
-        if ([device lockForConfiguration:&error]) {
+        if ([device lockForConfiguration:&error])
+        {
             [device unlockForConfiguration];
-        }else{
+        }else
+        {
             WYLog(@"setFlashModel-----%@",error);
         }
         
@@ -223,13 +245,18 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
 
 #pragma mark ---按钮action
 
-- (IBAction)takePhoto:(UIButton *)sender {
-    
+/**
+ *  拍照
+ */
+//FIXME: 这里一旦拍照就会连续点击两次拍照按钮之后会崩溃
+- (IBAction)takePhoto:(UIButton *)sender
+{
+
     dispatch_async(self.sessionQueue, ^{
+
         
         //得到输出设备的connection
         AVCaptureConnection *imageOutConnection = [self.stillImageOut connectionWithMediaType:AVMediaTypeVideo];
-        
         //设置图片输出的方向
         [imageOutConnection setVideoOrientation:self.connection.videoOrientation];
         
@@ -237,26 +264,30 @@ typedef void(^didCapturePictureBlock)(UIImage *stillImage);
         [self setFlashModel:AVCaptureFlashModeAuto forDevice:self.videoDeviceInput.device];
         
         //扑捉照片
-        [self.stillImageOut captureStillImageAsynchronouslyFromConnection:imageOutConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+        [self.stillImageOut captureStillImageAsynchronouslyFromConnection:imageOutConnection
+                                                        completionHandler:^(CMSampleBufferRef imageDataSampleBuffer
+                                                         , NSError *error)
+         {
             
-            if (imageDataSampleBuffer) {
+            if (imageDataSampleBuffer)
+            {
                 NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
                 UIImage *image = [UIImage imageWithData:data];
                 [[[ALAssetsLibrary alloc] init] writeImageToSavedPhotosAlbum:[image CGImage]
                                                                  orientation:(ALAssetOrientation)image.imageOrientation
                                                                  completionBlock:nil];
-                
-//                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
             }
             
         }];
         
-        
-        
     });
 }
 
-
-- (IBAction)changeCamera:(UIButton *)sender {
+/**
+ *  切换前后摄像头
+ */
+- (IBAction)changeCamera:(UIButton *)sender
+{
+    
 }
 @end

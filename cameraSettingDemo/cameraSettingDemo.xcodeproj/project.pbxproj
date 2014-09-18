@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A40AAF7919CA80DB002B8892 /* WYAVCameraPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = A40AAF7819CA80DB002B8892 /* WYAVCameraPreviewView.m */; };
 		A4B1DF4319CA6B85004A3F9C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4219CA6B85004A3F9C /* Foundation.framework */; };
 		A4B1DF4519CA6B85004A3F9C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4419CA6B85004A3F9C /* CoreGraphics.framework */; };
 		A4B1DF4719CA6B85004A3F9C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4619CA6B85004A3F9C /* UIKit.framework */; };
@@ -21,6 +22,9 @@
 		A4B1DF6419CA6B85004A3F9C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4619CA6B85004A3F9C /* UIKit.framework */; };
 		A4B1DF6C19CA6B85004A3F9C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A4B1DF6A19CA6B85004A3F9C /* InfoPlist.strings */; };
 		A4B1DF6E19CA6B85004A3F9C /* cameraSettingDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A4B1DF6D19CA6B85004A3F9C /* cameraSettingDemoTests.m */; };
+		A4B1DF7819CA6CB6004A3F9C /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF7719CA6CB6004A3F9C /* AVFoundation.framework */; };
+		A4B1DF7A19CA76C7004A3F9C /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF7919CA76C7004A3F9C /* ImageIO.framework */; };
+		A4B1DF7C19CA76D2004A3F9C /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF7B19CA76D2004A3F9C /* CoreMedia.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A40AAF7719CA80DB002B8892 /* WYAVCameraPreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYAVCameraPreviewView.h; sourceTree = "<group>"; };
+		A40AAF7819CA80DB002B8892 /* WYAVCameraPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYAVCameraPreviewView.m; sourceTree = "<group>"; };
 		A4B1DF3F19CA6B85004A3F9C /* cameraSettingDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cameraSettingDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4B1DF4219CA6B85004A3F9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A4B1DF4419CA6B85004A3F9C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -53,6 +59,9 @@
 		A4B1DF6919CA6B85004A3F9C /* cameraSettingDemoTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "cameraSettingDemoTests-Info.plist"; sourceTree = "<group>"; };
 		A4B1DF6B19CA6B85004A3F9C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A4B1DF6D19CA6B85004A3F9C /* cameraSettingDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = cameraSettingDemoTests.m; sourceTree = "<group>"; };
+		A4B1DF7719CA6CB6004A3F9C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A4B1DF7919CA76C7004A3F9C /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		A4B1DF7B19CA76D2004A3F9C /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +69,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4B1DF7C19CA76D2004A3F9C /* CoreMedia.framework in Frameworks */,
+				A4B1DF7A19CA76C7004A3F9C /* ImageIO.framework in Frameworks */,
+				A4B1DF7819CA6CB6004A3F9C /* AVFoundation.framework in Frameworks */,
 				A4B1DF4519CA6B85004A3F9C /* CoreGraphics.framework in Frameworks */,
 				A4B1DF4719CA6B85004A3F9C /* UIKit.framework in Frameworks */,
 				A4B1DF4319CA6B85004A3F9C /* Foundation.framework in Frameworks */,
@@ -101,6 +113,9 @@
 		A4B1DF4119CA6B85004A3F9C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A4B1DF7B19CA76D2004A3F9C /* CoreMedia.framework */,
+				A4B1DF7919CA76C7004A3F9C /* ImageIO.framework */,
+				A4B1DF7719CA6CB6004A3F9C /* AVFoundation.framework */,
 				A4B1DF4219CA6B85004A3F9C /* Foundation.framework */,
 				A4B1DF4419CA6B85004A3F9C /* CoreGraphics.framework */,
 				A4B1DF4619CA6B85004A3F9C /* UIKit.framework */,
@@ -117,6 +132,8 @@
 				A4B1DF5419CA6B85004A3F9C /* Main.storyboard */,
 				A4B1DF5719CA6B85004A3F9C /* WYViewController.h */,
 				A4B1DF5819CA6B85004A3F9C /* WYViewController.m */,
+				A40AAF7719CA80DB002B8892 /* WYAVCameraPreviewView.h */,
+				A40AAF7819CA80DB002B8892 /* WYAVCameraPreviewView.m */,
 				A4B1DF5A19CA6B85004A3F9C /* Images.xcassets */,
 				A4B1DF4919CA6B85004A3F9C /* Supporting Files */,
 			);
@@ -253,6 +270,7 @@
 				A4B1DF5319CA6B85004A3F9C /* WYAppDelegate.m in Sources */,
 				A4B1DF4F19CA6B85004A3F9C /* main.m in Sources */,
 				A4B1DF5919CA6B85004A3F9C /* WYViewController.m in Sources */,
+				A40AAF7919CA80DB002B8892 /* WYAVCameraPreviewView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,6 +477,7 @@
 				A4B1DF7319CA6B85004A3F9C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A4B1DF7419CA6B85004A3F9C /* Build configuration list for PBXNativeTarget "cameraSettingDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -467,6 +486,7 @@
 				A4B1DF7619CA6B85004A3F9C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

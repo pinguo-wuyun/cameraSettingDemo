@@ -21,22 +21,22 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="69D-EE-vjK">
-                                        <rect key="frame" x="176" y="855" width="44" height="30"/>
+                                        <rect key="frame" x="230" y="855" width="44" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="44" id="WwC-ed-ONC"/>
-                                            <constraint firstAttribute="height" constant="30" id="wtg-zY-77X"/>
+                                            <constraint firstAttribute="width" constant="44" id="60Y-FX-U97"/>
+                                            <constraint firstAttribute="height" constant="30" id="9cY-Gu-nlU"/>
                                         </constraints>
                                         <state key="normal" title="record">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0AE-g9-ARc">
-                                        <rect key="frame" x="423" y="855" width="51" height="30"/>
+                                        <rect key="frame" x="510" y="855" width="51" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="VET-KR-Wov"/>
-                                            <constraint firstAttribute="width" constant="51" id="aQh-uy-bq9"/>
+                                            <constraint firstAttribute="width" constant="51" id="CLM-gO-5h0"/>
+                                            <constraint firstAttribute="height" constant="30" id="TZa-I0-rbQ"/>
                                         </constraints>
                                         <state key="normal" title="camera">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -46,11 +46,11 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T9m-0w-7SN">
-                                        <rect key="frame" x="303" y="855" width="30" height="30"/>
+                                        <rect key="frame" x="369" y="855" width="30" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="30" id="0EB-dB-el5"/>
-                                            <constraint firstAttribute="height" constant="30" id="PoN-sj-BG5"/>
+                                            <constraint firstAttribute="height" constant="30" id="DQ1-yw-8Me"/>
+                                            <constraint firstAttribute="width" constant="30" id="qUL-Vf-vTP"/>
                                         </constraints>
                                         <state key="normal" title="still">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -62,22 +62,21 @@
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstItem="69D-EE-vjK" firstAttribute="leading" secondItem="ag3-Yo-w8r" secondAttribute="leading" constant="176" id="1dG-Uu-hwB"/>
-                                    <constraint firstItem="T9m-0w-7SN" firstAttribute="leading" secondItem="69D-EE-vjK" secondAttribute="trailing" constant="83" id="23d-dP-Sxl"/>
-                                    <constraint firstAttribute="bottom" secondItem="69D-EE-vjK" secondAttribute="bottom" constant="119" id="7p9-cf-rRl"/>
-                                    <constraint firstAttribute="bottom" secondItem="0AE-g9-ARc" secondAttribute="bottom" constant="119" id="K6J-wG-XDF"/>
-                                    <constraint firstAttribute="trailing" secondItem="0AE-g9-ARc" secondAttribute="trailing" constant="294" id="Xcv-DW-QL8"/>
-                                    <constraint firstItem="T9m-0w-7SN" firstAttribute="baseline" secondItem="69D-EE-vjK" secondAttribute="baseline" id="fKk-28-hPc"/>
-                                    <constraint firstItem="0AE-g9-ARc" firstAttribute="leading" secondItem="T9m-0w-7SN" secondAttribute="trailing" constant="90" id="ms4-ef-Hjd"/>
+                                    <constraint firstItem="T9m-0w-7SN" firstAttribute="leading" secondItem="69D-EE-vjK" secondAttribute="trailing" constant="95" id="0cK-vR-OJ1"/>
+                                    <constraint firstAttribute="bottom" secondItem="69D-EE-vjK" secondAttribute="bottom" constant="119" id="MIM-aT-bFi"/>
+                                    <constraint firstAttribute="bottom" secondItem="T9m-0w-7SN" secondAttribute="bottom" constant="119" id="Y4g-7G-0cI"/>
+                                    <constraint firstItem="0AE-g9-ARc" firstAttribute="leading" secondItem="T9m-0w-7SN" secondAttribute="trailing" constant="111" id="gvr-v4-qJT"/>
+                                    <constraint firstAttribute="bottom" secondItem="0AE-g9-ARc" secondAttribute="bottom" constant="119" id="o8h-nF-JEY"/>
+                                    <constraint firstAttribute="centerX" secondItem="T9m-0w-7SN" secondAttribute="centerX" id="y6Y-mp-Hzu"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="ag3-Yo-w8r" secondAttribute="bottom" id="eSE-EC-oz3"/>
-                            <constraint firstItem="ag3-Yo-w8r" firstAttribute="leading" secondItem="Poe-Ab-acr" secondAttribute="leading" id="fRQ-Ha-f8b"/>
-                            <constraint firstItem="ag3-Yo-w8r" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="kcT-Id-hb8"/>
-                            <constraint firstAttribute="trailing" secondItem="ag3-Yo-w8r" secondAttribute="trailing" id="rrc-or-D1P"/>
+                            <constraint firstAttribute="trailing" secondItem="ag3-Yo-w8r" secondAttribute="trailing" id="Tcb-MS-bUW"/>
+                            <constraint firstItem="ag3-Yo-w8r" firstAttribute="leading" secondItem="Poe-Ab-acr" secondAttribute="leading" id="Z3X-P2-wSe"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="ag3-Yo-w8r" secondAttribute="bottom" id="ccm-tk-7Mj"/>
+                            <constraint firstItem="ag3-Yo-w8r" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="rEi-W9-drQ"/>
                         </constraints>
                     </view>
                     <connections>

@@ -15,6 +15,7 @@
 
 typedef void(^didCapturePictureBlock)(UIImage *stillImage);
 
+//???: 搞不懂这三行是做嘛的！！！！T
 static void * CapturingStillImageContext = &CapturingStillImageContext;
 static void * RecordingContext = &RecordingContext;
 static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDeviceAuthorizedContext;
@@ -41,13 +42,14 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 @property (weak, nonatomic ) IBOutlet  UIButton              *cameraButton;
 
-//显示层
-@property (nonatomic,weak  ) UIView                *preView;
+
 
 //utility
 @property (nonatomic, getter = isDeviceAuthorized) BOOL deviceAuthorized;
 
 @property (nonatomic,assign)UIBackgroundTaskIdentifier backgroundRecordingID;
+
+@property (nonatomic) id runtimeErrorHandlingObserver;
 
 /**
  *  方法类
@@ -94,7 +96,9 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     dispatch_async(self.sessionQueue, ^{
 #warning 这句的作用不知道是什么
 		[self setBackgroundRecordingID:UIBackgroundTaskInvalid];
+        
         NSError *error = nil;
+        
         //设置是前置摄像头还是后置摄像头
         AVCaptureDevice *vedioDevice = [self deviveWithMediaType:AVMediaTypeVideo prefrringPosition:AVCaptureDevicePositionBack];
         
@@ -123,7 +127,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         {
             //设置输出的图片是jpg
             [stillImageOut setOutputSettings:@{AVVideoCodecKey : AVVideoCodecJPEG}];
-            [session canAddOutput:stillImageOut];
+            [session addOutput:stillImageOut];
             self.stillImageOut = stillImageOut;
         }
     });
@@ -153,12 +157,18 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 {
     [super viewWillAppear:animated];
     dispatch_async(self.sessionQueue, ^{
-        [self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized"
-                               options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
-                               context:SessionRunningAndDeviceAuthorizedContext];
-        [self addObserver:self forKeyPath:@"stillImageOut.capturingStillImage"
-                  options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-                  context:CapturingStillImageContext];
+//        [self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized"
+//                               options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+//                               context:SessionRunningAndDeviceAuthorizedContext];
+//        [self addObserver:self forKeyPath:@"stillImageOut.capturingStillImage"
+//                  options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+//                  context:CapturingStillImageContext];
+//        AVCaptureDevice *device = self.videoDeviceInput.device;
+//        
+//        [[NSNotificationCenter defaultCenter] addObserver:self
+//                                                 selector:@selector(subjectAreaDidChange:)
+//                                                 name:AVCaptureDeviceSubjectAreaDidChangeNotification
+//                                                  object:device];
         
         [self.session startRunning];
  
@@ -168,10 +178,11 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    dispatch_async(dispatch_get_main_queue(), ^{
-
-        []
+    dispatch_async(self.sessionQueue, ^{
         [self.session stopRunning];
+//        AVCaptureDevice *device = self.videoDeviceInput.device;
+//        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:device];
+//        [[NSNotificationCenter defaultCenter] removeObserver:self.runtimeErrorHandlingObserver];
     });
     
 }
@@ -252,19 +263,21 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 - (IBAction)takePhoto:(UIButton *)sender
 {
 
+    //异步函数不会立刻中断
     dispatch_async(self.sessionQueue, ^{
 
-        
-        //得到输出设备的connection
+        //FIXME: 这里返回的imageOutConnection是空，这里不可以使用局部变量
+//        //得到输出设备的connection
         AVCaptureConnection *imageOutConnection = [self.stillImageOut connectionWithMediaType:AVMediaTypeVideo];
         //设置图片输出的方向
-        [imageOutConnection setVideoOrientation:self.connection.videoOrientation];
+     [imageOutConnection setVideoOrientation:self.connection.videoOrientation];
+//        	[[self.stillImageOut connectionWithMediaType:AVMediaTypeVideo] setVideoOrientation:[[(AVCaptureVideoPreviewLayer *)[self.preview layer] connection] videoOrientation]];
         
         //设置闪光灯模式为自动
         [self setFlashModel:AVCaptureFlashModeAuto forDevice:self.videoDeviceInput.device];
         
         //扑捉照片
-        [self.stillImageOut captureStillImageAsynchronouslyFromConnection:imageOutConnection
+        [self.stillImageOut captureStillImageAsynchronouslyFromConnection:[self.stillImageOut connectionWithMediaType:AVMediaTypeVideo]
                                                         completionHandler:^(CMSampleBufferRef imageDataSampleBuffer
                                                          , NSError *error)
          {
@@ -290,4 +303,46 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 {
     
 }
+
+#pragma mark---通知方法
+/**
+ *  相机位置变动，改变子区域聚焦区域，曝光模式
+ */
+- (void)subjectAreaDidChange:(NSNotification *)note
+{
+    CGPoint devicePoint = CGPointMake(.5, .5);
+    [self foucusWithMode:AVCaptureFocusModeContinuousAutoFocus
+          exposeWithMode:AVCaptureExposureModeContinuousAutoExposure
+           atDevicePoint:devicePoint mointorSubjectAreaChange:NO];
+    [self foucusWithMode:AVCaptureFocusModeContinuousAutoFocus exposeWithMode:AVCaptureExposureModeContinuousAutoExposure atDevicePoint:devicePoint mointorSubjectAreaChange:NO];
+}
+
+-(void)foucusWithMode:(AVCaptureFocusMode)focusMode exposeWithMode:(AVCaptureExposureMode)exposeMode
+        atDevicePoint:(CGPoint)devicePoint mointorSubjectAreaChange:(BOOL)mointerSubjectChange
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        AVCaptureDevice *device = self.videoDeviceInput.device;
+        NSError *error = nil;
+        if ([device lockForConfiguration:&error])
+        {
+            if ([device isFocusModeSupported:focusMode] && [device isFocusPointOfInterestSupported])
+            {
+                [device setFocusMode:focusMode];
+                [device setFocusPointOfInterest:devicePoint];
+            }
+            if ([device isExposureModeSupported:exposeMode] && [device isExposurePointOfInterestSupported])
+            {
+                [device setExposureMode:exposeMode];
+                [device setExposurePointOfInterest:devicePoint];
+            }
+            [device setSubjectAreaChangeMonitoringEnabled:YES];
+            [device unlockForConfiguration];
+        }else
+        {
+            WYLog(@"foucusWithMode---%@",error);
+        }
+        
+    });
+}
+
 @end

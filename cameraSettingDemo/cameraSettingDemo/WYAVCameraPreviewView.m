@@ -11,7 +11,7 @@
 
 @implementation WYAVCameraPreviewView
 
-+(Class)layerClass
++ (Class)layerClass
 {
     return [AVCaptureVideoPreviewLayer class];
 }
@@ -19,13 +19,13 @@
 /**
 返回层的session
  */
--(AVCaptureSession *)session
+- (AVCaptureSession *)session
 {
     return [(AVCaptureVideoPreviewLayer *)[self layer] session];
 }
 
 //设置session
--(void)setSession:(AVCaptureSession *)session
+- (void)setSession:(AVCaptureSession *)session
 {
     [(AVCaptureVideoPreviewLayer *)[self layer]setSession:session];
 }

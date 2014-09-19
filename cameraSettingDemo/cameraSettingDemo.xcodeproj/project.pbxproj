@@ -25,6 +25,8 @@
 		A4B1DF7819CA6CB6004A3F9C /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF7719CA6CB6004A3F9C /* AVFoundation.framework */; };
 		A4B1DF7A19CA76C7004A3F9C /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF7919CA76C7004A3F9C /* ImageIO.framework */; };
 		A4B1DF7C19CA76D2004A3F9C /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF7B19CA76D2004A3F9C /* CoreMedia.framework */; };
+		A4B3FE5D19CC08760062A515 /* WYCaptureSessionManger.m in Sources */ = {isa = PBXBuildFile; fileRef = A4B3FE5C19CC08760062A515 /* WYCaptureSessionManger.m */; };
+		A4B3FE6019CC0BBF0062A515 /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = A4B3FE5F19CC0BBF0062A515 /* UIImage+Extension.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,10 @@
 		A4B1DF7719CA6CB6004A3F9C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A4B1DF7919CA76C7004A3F9C /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		A4B1DF7B19CA76D2004A3F9C /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		A4B3FE5B19CC08760062A515 /* WYCaptureSessionManger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYCaptureSessionManger.h; sourceTree = "<group>"; };
+		A4B3FE5C19CC08760062A515 /* WYCaptureSessionManger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYCaptureSessionManger.m; sourceTree = "<group>"; };
+		A4B3FE5E19CC0BBF0062A515 /* UIImage+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Extension.h"; sourceTree = "<group>"; };
+		A4B3FE5F19CC0BBF0062A515 /* UIImage+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Extension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +133,7 @@
 		A4B1DF4819CA6B85004A3F9C /* cameraSettingDemo */ = {
 			isa = PBXGroup;
 			children = (
+				A4B3FE5A19CC08760062A515 /* WYCaptureCamer */,
 				A4B1DF5119CA6B85004A3F9C /* WYAppDelegate.h */,
 				A4B1DF5219CA6B85004A3F9C /* WYAppDelegate.m */,
 				A4B1DF5419CA6B85004A3F9C /* Main.storyboard */,
@@ -167,6 +174,17 @@
 				A4B1DF6A19CA6B85004A3F9C /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A4B3FE5A19CC08760062A515 /* WYCaptureCamer */ = {
+			isa = PBXGroup;
+			children = (
+				A4B3FE5B19CC08760062A515 /* WYCaptureSessionManger.h */,
+				A4B3FE5C19CC08760062A515 /* WYCaptureSessionManger.m */,
+				A4B3FE5E19CC0BBF0062A515 /* UIImage+Extension.h */,
+				A4B3FE5F19CC0BBF0062A515 /* UIImage+Extension.m */,
+			);
+			path = WYCaptureCamer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -268,7 +286,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A4B1DF5319CA6B85004A3F9C /* WYAppDelegate.m in Sources */,
+				A4B3FE5D19CC08760062A515 /* WYCaptureSessionManger.m in Sources */,
 				A4B1DF4F19CA6B85004A3F9C /* main.m in Sources */,
+				A4B3FE6019CC0BBF0062A515 /* UIImage+Extension.m in Sources */,
 				A4B1DF5919CA6B85004A3F9C /* WYCamerController.m in Sources */,
 				A40AAF7919CA80DB002B8892 /* WYAVCameraPreviewView.m in Sources */,
 			);

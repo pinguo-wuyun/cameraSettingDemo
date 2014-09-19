@@ -14,6 +14,7 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
 
-#define WYLog(...) NSLog(__VA_ARGS__)
+    #define WYLog(...) NSLog(__VA_ARGS__)
 
 #endif
+#define screenW  [UIScreen mainScreen].bounds.size.width

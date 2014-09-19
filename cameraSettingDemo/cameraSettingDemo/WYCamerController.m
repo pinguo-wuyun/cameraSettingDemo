@@ -18,6 +18,9 @@ static void * RecordingContext = &RecordingContext;
 static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDeviceAuthorizedContext;
 
 
+
+//TODO: 相机的预览和保存>>保存让用户手动保存
+
 @interface WYCamerController ()
 
 /**输入设备*/

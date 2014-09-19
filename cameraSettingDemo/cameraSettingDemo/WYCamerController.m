@@ -26,6 +26,8 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 @property (nonatomic,strong) AVCaptureStillImageOutput *stillImageOut;
 /**连接输入和输出设备session*/
 @property (nonatomic,strong) AVCaptureSession          *session;
+@property (nonatomic,strong) AVCaptureDevice           *caputreDevice;
+
 /**
  *  session队列
  */
@@ -53,6 +55,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 /**
  *  方法类
  */
+
 - (IBAction)takePhoto:(UIButton *)sender;
 
 - (IBAction)changeCamera:(UIButton *)sender;
@@ -75,6 +78,28 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     }
     return _connection;
 }
+
+-(AVCaptureDevice *)caputreDevice
+{
+    if (_caputreDevice == nil) {
+        
+        NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+           _caputreDevice = [devices firstObject];
+        
+        for (AVCaptureDevice *device in devices)
+        {
+            if ( [device position] == AVCaptureDevicePositionBack)
+            {
+                
+                _caputreDevice = device;
+                break;
+            }
+        }
+
+    }
+    return _caputreDevice;
+}
+
 
 
 
@@ -135,7 +160,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 }
 
 
-//创建AVCaptureDevice
+//创建并查找可用的AVCaptureDevice
 - (AVCaptureDevice *)deviveWithMediaType:(NSString *)mediaType prefrringPosition:(AVCaptureDevicePosition)postion
 {
     NSArray *devices = [AVCaptureDevice devicesWithMediaType:mediaType];
@@ -217,6 +242,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     return UIInterfaceOrientationMaskAll;
 }
 
+//TODO: 这些方向完全不懂是为了什么？
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     [self.connection setVideoOrientation:(AVCaptureVideoOrientation )toInterfaceOrientation];
@@ -260,6 +286,11 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
  *  拍照
  */
 //FIXME: 这里一旦拍照就会连续点击两次拍照按钮之后会崩溃
+- (IBAction)setWhiteBlance {
+    
+
+}
+
 - (IBAction)takePhoto:(UIButton *)sender
 {
 
@@ -277,8 +308,8 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         [self setFlashModel:AVCaptureFlashModeAuto forDevice:self.videoDeviceInput.device];
         
         //扑捉照片
-        [self.stillImageOut captureStillImageAsynchronouslyFromConnection:[self.stillImageOut connectionWithMediaType:AVMediaTypeVideo]
-                                                        completionHandler:^(CMSampleBufferRef imageDataSampleBuffer
+        [self.stillImageOut captureStillImageAsynchronouslyFromConnection:imageOutConnection
+                                                       completionHandler:^(CMSampleBufferRef imageDataSampleBuffer
                                                          , NSError *error)
          {
             
@@ -286,6 +317,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
             {
                 NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
                 UIImage *image = [UIImage imageWithData:data];
+#warning 不懂为什么用这个，而不用这个uiinagewriteToSavePhotosAblum
                 [[[ALAssetsLibrary alloc] init] writeImageToSavedPhotosAlbum:[image CGImage]
                                                                  orientation:(ALAssetOrientation)image.imageOrientation
                                                                  completionBlock:nil];
@@ -301,6 +333,56 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
  */
 - (IBAction)changeCamera:(UIButton *)sender
 {
+    self.stillButoon.enabled = NO;
+    self.cameraButton.enabled = NO;
+    
+    dispatch_async(self.sessionQueue, ^{
+        
+        AVCaptureDevicePosition preffedPostion = AVCaptureDevicePositionUnspecified;
+        
+        AVCaptureDevicePosition currentPosition = [self.videoDeviceInput device].position;
+        switch (currentPosition) {
+            case AVCaptureDevicePositionUnspecified:
+                preffedPostion = AVCaptureDevicePositionBack;
+                break;
+            case AVCaptureDevicePositionFront:
+                preffedPostion = AVCaptureDevicePositionBack;
+                break;
+            case AVCaptureDevicePositionBack:
+                preffedPostion = AVCaptureDevicePositionFront;
+                break;
+                
+            default:
+                WYLog(@"无知的的位置");
+                break;
+        }
+        
+        
+        AVCaptureDevice *captureDevice = [self deviveWithMediaType:AVMediaTypeVideo prefrringPosition:preffedPostion];
+        
+        NSError *error = nil;
+        AVCaptureDeviceInput *vedioInputDevice = [AVCaptureDeviceInput deviceInputWithDevice:captureDevice error:&error];
+        
+        [self.session beginConfiguration];
+        [self.session removeInput:self.videoDeviceInput];
+        if ([self.session canAddInput:vedioInputDevice])
+        {
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(subjectAreaDidChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
+            [self.session addInput:vedioInputDevice];
+            self.videoDeviceInput =vedioInputDevice;
+        }else
+        {
+            [self.session addInput:self.videoDeviceInput];
+        }
+        
+        [self.session commitConfiguration];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.cameraButton.enabled = YES;
+            self.stillButoon.enabled = YES;
+        });
+        
+    });
     
 }
 

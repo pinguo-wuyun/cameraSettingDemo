@@ -8,8 +8,13 @@
 
 #import "WYCaptureSessionManger.h"
 
+const CGFloat maxPinchScaleNum = 3.f;
+const CGFloat minPinchScaleNum = 1.f;
+
 @interface WYCaptureSessionManger()
+
 @property (nonatomic,strong)UIView *preview;
+
 @end
 
 
@@ -36,9 +41,7 @@
 #pragma mark ---初始化方法
 - (void)configureWithPartentLayer:(UIView *)parent previewRect:(CGRect)previewRect
 {
-      self.preview = parent;
-//    [parent.layer addSublayer:self.previewLayer]
-    
+    self.preview = parent;
     //1创建队列
     [self createQueue];
     //2添加session
@@ -170,16 +173,9 @@
                             {
                                 NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
                                 UIImage *image = [UIImage imageWithData:imageData];
-                              //在这里计算得到新的图片的frame和新的图片
-                                CGFloat squareLength =  screenW;
-                                CGFloat headHeight = self.previewLayer.bounds.size.height - squareLength;
-                                CGSize size = CGSizeMake(squareLength *2, squareLength *2);
-                                //调整为预览后的图片
-//                                UIImage *scaledImage = [image ]
                                 if (didCaptureBlock) {
                                     didCaptureBlock(image);
                                 }
-
                             }else
                             {
                                 WYLog(@"%@",error);

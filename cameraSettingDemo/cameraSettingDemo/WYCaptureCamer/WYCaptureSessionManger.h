@@ -9,12 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 
-
-
-
-//const CGFloat maxPinchScaleNum = 3.f;
-//const CGFloat minPinchScaleNum = 1.f;
-
 typedef void(^didCapturePhotoBlock)(UIImage *image);
 /**
  *  这个类是对相机类的封装，是个可以使用相机的工具类

@@ -10,84 +10,172 @@
 #import "WYCaptureSessionManger.h"
 #import "SVProgressHUD.h"
 
+#define kBottomContainerView_COLOR     [UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.f]       //bottomContainerView的上半部分
+#define kBottomContainerView_DOWN_COLOR   [UIColor colorWithRed:68/255.0f green:68/255.0f blue:68/255.0f alpha:1.f]       //bottomContainerView的下半部分
+const CGFloat kCameraMenuH = 44;
+const CGFloat kCameraBtnW = 90;
+const CGFloat kButtonNum = 4;
+
 @interface WYCamerViewController ()
 {
     int m_alphaTimes;
     CGPoint m_currentPoint;
 }
-
+/**相机管理工具*/
 @property (nonatomic,strong)WYCaptureSessionManger *captureManger;
-//在这里自定义想要展示的相机界面
-@property (nonatomic, strong) UIView *bottomContainerView;//除了顶部标题、拍照区域剩下的所有区域
 
-@property (nonatomic, strong) UIView *cameraMenuView;//网格、闪光灯、前后摄像头等按钮
+//在这里自定义想要展示的相机界面
+@property (nonatomic, strong) UIView *bottomContainerView;
+
+/**照相机菜单*/
+@property (nonatomic, strong) UIView *cameraMenuView;
 
 @property (nonatomic, strong) NSMutableSet *cameraBtnSet;
-//对焦
+
+/** 对焦图片*/
 @property (nonatomic, strong) UIImageView *focusImageView;
+
+/** 当拍照完成的时候添加一个上部的遮盖*/
+@property (nonatomic,strong)UIView *finshTakingUpView;
+
+/* * 当拍照完成的时候添加一个下部的遮盖*/
+@property (nonatomic,strong)UIView  *finshTakingDownView;
+
+@property (nonatomic,strong)NSMutableArray *cameraBtns;
 
 @end
 
 @implementation WYCamerViewController
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-        m_alphaTimes = -1;
-        m_currentPoint = CGPointZero;
-        
-        
-    }
-    return self;
-}
-
+#pragma mark --初始化方法--
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-//    self.view.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.3];
-    
-    
     //创建相机工具类
     WYCaptureSessionManger *captureManger = [[WYCaptureSessionManger alloc] init];
-    //
+
+    //如果外部没有设置预览的尺寸，那么则创建一个默认的尺寸
     if (CGRectEqualToRect(self.previewRect, CGRectZero)) {
         self.previewRect  =CGRectMake(0, 0, screenW, screenW+44);
     }
-    
-//    [self.captureManger configureWithPartentLayer:self.view previewRect:self.previewRect];
     [captureManger configureWithPartentLayer:self.view previewRect:self.previewRect];
     
     [captureManger.session startRunning];
     self.captureManger = captureManger;
   
-    [self setUpBottomMenu];
+    //添加底部容器
+    [self setUpBottomContainerView];
+    [self addCameraMenuView];
+    [self addBottomMenu];
+    //添加照相完成时的上下遮盖
+    [self addCameraCover];
     
 }
 
-- (void)setUpBottomMenu
+/**
+ *  添加底部整体的容器
+ */
+- (void)setUpBottomContainerView
 {
-    UIButton *takePicBtn = [[UIButton alloc] init];
-    CGFloat     takePicBtnX = screenW *0.5;
-    CGFloat takePicBtnY = screenH -88;
     
+    CGFloat bottomY = CGRectGetMaxY(self.captureManger.previewLayer.frame);
+    CGRect bottomF = CGRectMake(0, bottomY, screenW, screenH - bottomY);
     
-    takePicBtn.frame = CGRectMake(takePicBtnX-150, takePicBtnY, 150, 44);
+    UIView *bottomView = [[UIView alloc] initWithFrame:bottomF];
+    bottomView.backgroundColor = kBottomContainerView_COLOR;
+    [self.view addSubview:bottomView];
+    self.bottomContainerView = bottomView;
+
+}
+/**
+ *  添加底部菜单
+ */
+- (void)addBottomMenu
+{
+    CGFloat bottomMenuY = screenH - kCameraMenuH;
     
-    [takePicBtn setTitle:@"测试按钮" forState:UIControlStateNormal];
-    [self.view addSubview:takePicBtn];
+    UIView *bottomMenuView = [[UIView alloc] initWithFrame:CGRectMake(0, bottomMenuY, screenW, kCameraMenuH)];
+    bottomMenuView.backgroundColor = kBottomContainerView_DOWN_COLOR;
     
+    [self.view addSubview:bottomMenuView];
+    self.cameraMenuView = bottomMenuView;
     
-    [takePicBtn addTarget:self action:@selector(takeBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self addMenuButtons];
+}
+
+/**
+ *  添加上部的拍照按钮
+ */
+- (void)addCameraMenuView
+{
+    //底部菜单的高度
+    CGFloat downMenuH = kCameraMenuH;
     
+    //按钮的宽度和高度一样
+    CGFloat cameraBtnW = kCameraBtnW;
+    CGFloat cameraBtnH = cameraBtnW;
+    CGFloat cameraBtnX = (screenW - cameraBtnW) / 2;
+    CGFloat cameraBtnY = (self.bottomContainerView.frame.size.height - downMenuH -cameraBtnH) / 2;
+    CGRect cameraBtnF = CGRectMake(cameraBtnX, cameraBtnY, cameraBtnW, cameraBtnW);
     
+    [self creatCamerBtn:cameraBtnF norImageStr:@"shot.png"
+                                   highlightImgStr:@"shot_h.png" selImgStr:nil
+                 action:@selector(takeBtnClick:) parentView:self.bottomContainerView];
+    [self addMenuButtons];
+}
+
+
+
+- (void)addMenuButtons
+{
+    //普通状态下四个按钮的属性
+    NSMutableArray *norAttr = [NSMutableArray arrayWithArray:@[@"close_cha.png", @"camera_line.png", @"switch_camera.png", @"flashing_off.png"]];
+    
+    //高亮状态下四个按钮的属性
+    NSMutableArray *highAttr = [NSMutableArray arrayWithArray:@[@"close_cha_h.png", @"", @"", @""]];
+    
+    //选择状态下的四个按钮的属性
+    NSMutableArray *selectedAttr = [NSMutableArray arrayWithArray:@[@"", @"camera_line_h.png", @"switch_camera_h.png", @""]];
+    NSMutableArray *actionAttr = [NSMutableArray arrayWithArray:@[@"dismissBtnPressed:", @"gridBtnPressed:", @"switchCameraBtnPressed:", @"flashBtnPressed:"]];
+    
+    //按钮的宽度
+    CGFloat btnW = screenW / actionAttr.count;
+    
+    for (int i = 0; i < actionAttr.count; i++) {
+        CGFloat btnH = kCameraMenuH;
+        
+        CGRect btnFrame = CGRectMake(btnW * i, 0, btnW, btnH);
+        UIButton *btn = [self creatCamerBtn:btnFrame norImageStr:[norAttr objectAtIndex:i]
+                            highlightImgStr:[highAttr objectAtIndex:i]
+                                  selImgStr:[selectedAttr objectAtIndex:i] action:NSSelectorFromString([actionAttr objectAtIndex:i]) parentView:self.cameraMenuView];
+        btn.showsTouchWhenHighlighted = YES;
+        [self.cameraBtns addObject:btn];
+    }
+}
+
+- (UIButton *)creatCamerBtn:(CGRect)btnFrame norImageStr:(NSString *)norImagStr highlightImgStr:(NSString *)higImgStr
+                                            selImgStr:(NSString*)selImgStr
+                                            action:(SEL)action parentView:(UIView *)parentView
+{
+    //创建button
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    
+    button.frame  = btnFrame;
+    [button setImage:[UIImage imageNamed:norImagStr] forState:UIControlStateNormal];
+    [button setImage:[UIImage imageNamed:higImgStr] forState:UIControlStateHighlighted];
+
+    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    
+    [parentView addSubview:button];
+    
+    return button;
     
 }
 
+/**
+ *  点击对应拍照按钮
+ */
 - (void)takeBtnClick:(UIButton *)button
 {
-    WYLog(@"takeBtnClick");
     //首先判断用户是否支持拍照，相机是否已经损坏
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
     {
@@ -96,31 +184,97 @@
     }
     
     button.userInteractionEnabled = NO;
+    
+    [self showCameraCover:YES];
+    
     //拍照过程中禁止再次触摸
     __block UIActivityIndicatorView *activew = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     activew.center = CGPointMake(self.view.center.x, self.view.center.y - 44);
     [activew startAnimating];
     [self.view addSubview:activew];
     
-    
+    __weak typeof (self) weakself = self;
     [self.captureManger takePicture:^(UIImage *image)
     {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
         });
-        button.userInteractionEnabled = YES;
         [activew stopAnimating];
         [activew removeFromSuperview];
         activew = nil;
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            
+            button.userInteractionEnabled = YES;
+            [weakself showCameraCover:NO];
         });
-        
     }];
-
-    
 }
+/**
+ *  拍照工程中添加遮盖
+ */
+- (void)addCameraCover
+{
+    //上部遮盖
+    UIView *upView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenW, 0)];
+    upView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:upView];
+    self.finshTakingUpView = upView;
+    
+    //下部遮盖
+    UIView *downView = [[UIView alloc] initWithFrame:CGRectMake(0, screenH - self.bottomContainerView.frame.size.height, screenW, 0)];
+    downView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:downView];
+    self.finshTakingDownView = downView;
+    
+
+}
+
+/**
+ *  调整是否显示遮盖
+ *
+ *  @param isSHow 是否显示遮盖
+ */
+- (void)showCameraCover:(BOOL)isSHow
+{
+    [UIView animateWithDuration:0.38 animations:^{
+        
+        CGRect upFrame = self.finshTakingUpView.frame;
+        upFrame.size.height  =(isSHow ? screenW / 2 +44 : 0);
+        self.finshTakingUpView.frame  =upFrame;
+        
+        
+        CGRect downFrame = self.finshTakingDownView.frame;
+        downFrame.origin.y  = (isSHow ? screenW / 2 + 44 : screenH - 44);
+        downFrame.size.height = (isSHow ? screenW / 2 : 0);
+        self.finshTakingDownView.frame  =downFrame;
+    }];
+}
+
+#pragma  mark ---按钮方法---
+
+- (void)dismissBtnPressed:(UIButton *)button
+{
+    [self dismissViewControllerAnimated:NO completion:nil];
+}
+
+- (void)gridBtnPressed:(UIButton *)button
+{
+       WYLog(@"gridBtnPressed");
+}
+/**
+ *  切换摄像头
+ */
+- (void)switchCameraBtnPressed:(UIButton *)button
+{
+    button.selected = !button.selected;
+    [self.captureManger swithCamer:button.selected];
+}
+
+- (void)flashBtnPressed:(UIButton *)button
+{
+    WYLog(@"flashBtnPressed");
+}
+
 
 - (BOOL)prefersStatusBarHidden
 {

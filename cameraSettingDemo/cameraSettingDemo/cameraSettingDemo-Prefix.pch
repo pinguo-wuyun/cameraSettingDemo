@@ -18,3 +18,4 @@
 
 #endif
 #define screenW  [UIScreen mainScreen].bounds.size.width
+#define screenH  [UIScreen mainScreen].bounds.size.height

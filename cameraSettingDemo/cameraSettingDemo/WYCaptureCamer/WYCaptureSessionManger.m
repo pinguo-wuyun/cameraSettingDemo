@@ -33,9 +33,11 @@
     self.session = nil;
 }
 
+#pragma mark ---初始化方法
 - (void)configureWithPartentLayer:(UIView *)parent previewRect:(CGRect)previewRect
 {
-    self.preview = parent;
+      self.preview = parent;
+//    [parent.layer addSublayer:self.previewLayer]
     
     //1创建队列
     [self createQueue];
@@ -43,9 +45,10 @@
     [self addSession];
     //3添加相机的预览界面
     [self addVideoPreviewLayerWithRect:previewRect];
+    [parent.layer addSublayer:self.previewLayer];
     
     //4添加输入设备
-    [self addVideoInputFromCamera:NO];
+    [self addVideoInputFrontCamera:NO];
     //5添加输出设备
     [self addStillImageOut];
     
@@ -67,10 +70,10 @@
 /**
  *  添加相机的实时预览界面
  */
--(void)addVideoPreviewLayerWithRect: (CGRect)previewRect
+- (void)addVideoPreviewLayerWithRect: (CGRect)previewRect
 {
     AVCaptureVideoPreviewLayer *previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
-    previewLayer.videoGravity = AVLayerVideoGravityResize;
+    previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     previewLayer.frame  = previewRect;
     self.previewLayer = previewLayer;
 }
@@ -80,7 +83,7 @@
  *
  *  @param isFront 是否是前置摄像头
  */
-- (void)addVideoInputFromCamera:(BOOL)isFront
+- (void)addVideoInputFrontCamera:(BOOL)isFront
 {
     NSArray *devices = [AVCaptureDevice devices];
     AVCaptureDevice *frontCamer;
@@ -148,16 +151,21 @@
 {
     AVCaptureStillImageOutput *stillImageOut = [[AVCaptureStillImageOutput alloc]  init];
     stillImageOut.outputSettings = @{AVVideoCodecKey : AVVideoCodecJPEG};
+    self.stillImageOut = stillImageOut;
+    
     if ([self.session canAddOutput:stillImageOut]) {
         [self.session addOutput:stillImageOut];
     }
 }
+
+#pragma mark --一些公共的行为
 - (void)takePicture:(didCapturePhotoBlock)didCaptureBlock
 {
     AVCaptureConnection *captureConnection = [self.stillImageOut connectionWithMediaType:AVMediaTypeVideo];
      [self.stillImageOut captureStillImageAsynchronouslyFromConnection:captureConnection
                         completionHandler:^(CMSampleBufferRef imageDataSampleBuffer,
-                                                                         NSError *error){
+                                                                         NSError *error) {
+        
                             if (!error)
                             {
                                 NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
@@ -166,23 +174,56 @@
                                 CGFloat squareLength =  screenW;
                                 CGFloat headHeight = self.previewLayer.bounds.size.height - squareLength;
                                 CGSize size = CGSizeMake(squareLength *2, squareLength *2);
+                                //调整为预览后的图片
 //                                UIImage *scaledImage = [image ]
-                                
-                                
-                                
-                                
-                                
-                                
-                                
+                                if (didCaptureBlock) {
+                                    didCaptureBlock(image);
+                                }
 
                             }else
                             {
                                 WYLog(@"%@",error);
                             }
-                            
-                            
+
          
      }];
+
+}
+
+
+
+-(void)swithCamer:(BOOL)isFrontCamer
+{
+    if (!self.inputDevice)  return;
+    [self.session beginConfiguration];
+    [self.session removeInput:self.inputDevice];
+    [self addVideoInputFrontCamera:isFrontCamer];
+    [self.session commitConfiguration];
+}
+
+/**
+ *  拉近远镜头
+ *
+ *  @param gesture 手势
+ */
+- (void)pinchcamerView:(UIGestureRecognizer *)gesture
+{
+    
+}
+
+- (void)pinchCamerViewWithScaleNum:(CGFloat)scale
+{
+    
+}
+
+- (void)swithGrid:(BOOL)toShow
+{
+    
+}
+
+- (void)focusInPoint:(CGPoint)devicePoint
+{
+    
 }
 
 

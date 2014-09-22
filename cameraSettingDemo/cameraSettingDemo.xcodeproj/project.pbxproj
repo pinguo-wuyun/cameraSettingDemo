@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A40AAF7919CA80DB002B8892 /* WYAVCameraPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = A40AAF7819CA80DB002B8892 /* WYAVCameraPreviewView.m */; };
+		A45213CC19CFBB410065B7A8 /* WYCamerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A45213CB19CFBB410065B7A8 /* WYCamerViewController.m */; };
+		A452141B19CFE0230065B7A8 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A452141819CFE0230065B7A8 /* SVProgressHUD.bundle */; };
+		A452141C19CFE0230065B7A8 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = A452141A19CFE0230065B7A8 /* SVProgressHUD.m */; };
 		A4B1DF4319CA6B85004A3F9C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4219CA6B85004A3F9C /* Foundation.framework */; };
 		A4B1DF4519CA6B85004A3F9C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4419CA6B85004A3F9C /* CoreGraphics.framework */; };
 		A4B1DF4719CA6B85004A3F9C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B1DF4619CA6B85004A3F9C /* UIKit.framework */; };
@@ -42,6 +45,11 @@
 /* Begin PBXFileReference section */
 		A40AAF7719CA80DB002B8892 /* WYAVCameraPreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYAVCameraPreviewView.h; sourceTree = "<group>"; };
 		A40AAF7819CA80DB002B8892 /* WYAVCameraPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYAVCameraPreviewView.m; sourceTree = "<group>"; };
+		A45213CA19CFBB410065B7A8 /* WYCamerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYCamerViewController.h; sourceTree = "<group>"; };
+		A45213CB19CFBB410065B7A8 /* WYCamerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYCamerViewController.m; sourceTree = "<group>"; };
+		A452141819CFE0230065B7A8 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SVProgressHUD.bundle; sourceTree = "<group>"; };
+		A452141919CFE0230065B7A8 /* SVProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVProgressHUD.h; sourceTree = "<group>"; };
+		A452141A19CFE0230065B7A8 /* SVProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVProgressHUD.m; sourceTree = "<group>"; };
 		A4B1DF3F19CA6B85004A3F9C /* cameraSettingDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cameraSettingDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4B1DF4219CA6B85004A3F9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A4B1DF4419CA6B85004A3F9C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -97,6 +105,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A45213CD19CFD4C80065B7A8 /* Vendors */ = {
+			isa = PBXGroup;
+			children = (
+				A452141719CFE0230065B7A8 /* SVProgressHUD */,
+			);
+			path = Vendors;
+			sourceTree = "<group>";
+		};
+		A452141719CFE0230065B7A8 /* SVProgressHUD */ = {
+			isa = PBXGroup;
+			children = (
+				A452141819CFE0230065B7A8 /* SVProgressHUD.bundle */,
+				A452141919CFE0230065B7A8 /* SVProgressHUD.h */,
+				A452141A19CFE0230065B7A8 /* SVProgressHUD.m */,
+			);
+			path = SVProgressHUD;
+			sourceTree = "<group>";
+		};
 		A4B1DF3619CA6B85004A3F9C = {
 			isa = PBXGroup;
 			children = (
@@ -133,6 +159,7 @@
 		A4B1DF4819CA6B85004A3F9C /* cameraSettingDemo */ = {
 			isa = PBXGroup;
 			children = (
+				A45213CD19CFD4C80065B7A8 /* Vendors */,
 				A4B3FE5A19CC08760062A515 /* WYCaptureCamer */,
 				A4B1DF5119CA6B85004A3F9C /* WYAppDelegate.h */,
 				A4B1DF5219CA6B85004A3F9C /* WYAppDelegate.m */,
@@ -183,6 +210,8 @@
 				A4B3FE5C19CC08760062A515 /* WYCaptureSessionManger.m */,
 				A4B3FE5E19CC0BBF0062A515 /* UIImage+Extension.h */,
 				A4B3FE5F19CC0BBF0062A515 /* UIImage+Extension.m */,
+				A45213CA19CFBB410065B7A8 /* WYCamerViewController.h */,
+				A45213CB19CFBB410065B7A8 /* WYCamerViewController.m */,
 			);
 			path = WYCaptureCamer;
 			sourceTree = "<group>";
@@ -267,6 +296,7 @@
 				A4B1DF5B19CA6B85004A3F9C /* Images.xcassets in Resources */,
 				A4B1DF4D19CA6B85004A3F9C /* InfoPlist.strings in Resources */,
 				A4B1DF5619CA6B85004A3F9C /* Main.storyboard in Resources */,
+				A452141B19CFE0230065B7A8 /* SVProgressHUD.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,8 +316,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A4B1DF5319CA6B85004A3F9C /* WYAppDelegate.m in Sources */,
+				A452141C19CFE0230065B7A8 /* SVProgressHUD.m in Sources */,
 				A4B3FE5D19CC08760062A515 /* WYCaptureSessionManger.m in Sources */,
 				A4B1DF4F19CA6B85004A3F9C /* main.m in Sources */,
+				A45213CC19CFBB410065B7A8 /* WYCamerViewController.m in Sources */,
 				A4B3FE6019CC0BBF0062A515 /* UIImage+Extension.m in Sources */,
 				A4B1DF5919CA6B85004A3F9C /* WYCamerController.m in Sources */,
 				A40AAF7919CA80DB002B8892 /* WYAVCameraPreviewView.m in Sources */,

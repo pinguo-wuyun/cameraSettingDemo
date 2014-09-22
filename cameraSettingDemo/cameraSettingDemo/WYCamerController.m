@@ -8,8 +8,9 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-
 #import "WYCamerController.h"
+
+#import "WYCamerViewController.h"
 #import "WYAVCameraPreviewView.h"
 
 //???: 搞不懂这三行是做嘛的！！！！T
@@ -197,7 +198,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:device];
 //        [[NSNotificationCenter defaultCenter] removeObserver:self.runtimeErrorHandlingObserver];
         [self removeObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" context:SessionRunningAndDeviceAuthorizedContext];
-        [self removeObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" context:CapturingStillImageContext];
+         [self removeObserver:self forKeyPath:@"stillImageOut.capturingStillImage" context:CapturingStillImageContext];
     });
     
 }
@@ -262,14 +263,11 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 /**
  *  拍照
  */
-//FIXME: 这里一旦拍照就会连续点击两次拍照按钮之后会崩溃
 - (IBAction)takePhoto:(UIButton *)sender
 {
 
     //异步函数不会立刻中断
     dispatch_async(self.sessionQueue, ^{
-
-        //FIXME: 这里返回的imageOutConnection是空，这里不可以使用局部变量
 //        //得到输出设备的connection
         AVCaptureConnection *imageOutConnection = [self.stillImageOut connectionWithMediaType:AVMediaTypeVideo];
         //设置图片输出的方向
@@ -304,6 +302,9 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
  */
 - (IBAction)changeCamera:(UIButton *)sender
 {
+    //!!!: 在这里做一些测试
+    WYCamerViewController *camerVc = [[WYCamerViewController alloc] init];
+    [self presentViewController:camerVc animated:YES completion:nil];
     
 }
 

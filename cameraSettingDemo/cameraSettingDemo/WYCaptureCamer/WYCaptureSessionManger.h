@@ -12,8 +12,8 @@
 
 
 
-const CGFloat maxPinchScaleNum = 3.f;
-const CGFloat minPinchScaleNum = 1.f;
+//const CGFloat maxPinchScaleNum = 3.f;
+//const CGFloat minPinchScaleNum = 1.f;
 
 typedef void(^didCapturePhotoBlock)(UIImage *image);
 /**

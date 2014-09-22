@@ -27,7 +27,7 @@
             break;
             
         default:
-            [NSException raise:NSInvalidArgumentException format:@"unspoortedMode : %ld",contenMode];
+            [NSException raise:NSInvalidArgumentException format:@"unspoortedMode : %d",contenMode];
     }
     CGSize newSize = CGSizeMake(self.size.width * ratio, self.size.height * ratio);
     return [self resizedImage:newSize interPolationQuality:quality];

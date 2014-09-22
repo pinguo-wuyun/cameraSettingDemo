@@ -380,7 +380,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
                 [[[UIAlertView alloc] initWithTitle:@"AVM!"
                                             message:@"AVCam doesn't have permission to use Camera, please change privacy settings"
                                            delegate:self
-                                  cancelButtonTitle:@"cancel"
+                                   cancelButtonTitle:@"cancel"
                                   otherButtonTitles:nil] show];
                 [self setDeviceAuthorized:NO];
                 

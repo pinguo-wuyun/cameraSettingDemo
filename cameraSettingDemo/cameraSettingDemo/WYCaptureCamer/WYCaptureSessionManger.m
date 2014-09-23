@@ -5,11 +5,11 @@
 //  Created by camera360 on 14-9-19.
 //  Copyright (c) 2014年 camera360. All rights reserved.
 //
+//TODO: 拍照后的预览功能，自动聚焦,（闪光灯没有）测光,分辨率的设置，帧率？（相机也有帧率）白平衡，曝光，iso(实时预览特效？)
 
 #import "WYCaptureSessionManger.h"
-
-const CGFloat maxPinchScaleNum = 3.f;
-const CGFloat minPinchScaleNum = 1.f;
+const CGFloat kMaxPinchScaleNum = 3.f;
+const CGFloat kMinPinchScaleNum = 1.f;
 
 @interface WYCaptureSessionManger()
 
@@ -180,8 +180,6 @@ const CGFloat minPinchScaleNum = 1.f;
                             {
                                 WYLog(@"%@",error);
                             }
-
-         
      }];
 
 }
@@ -198,18 +196,79 @@ const CGFloat minPinchScaleNum = 1.f;
 }
 
 /**
+ *  捏合手指
+ */
+- (void)pinchCamerViewWithScaleNum:(CGFloat)scale
+{
+    self.scaleNum = scale;
+    if (scale < kMinPinchScaleNum)
+    {
+        scale = kMinPinchScaleNum;
+    }
+    else if(scale > kMaxPinchScaleNum)
+    {
+        scale = kMaxPinchScaleNum;
+    }
+    [self doPinch];
+    self.scaleNum = scale;
+}
+
+/**
  *  拉近远镜头
  *
  *  @param gesture 手势
  */
-- (void)pinchcamerView:(UIGestureRecognizer *)gesture
+- (void)pinchcamerView:(UIPinchGestureRecognizer *)gesture
 {
+    BOOL allTouchesAreOnThePreviewLayer = YES;
+    NSUInteger numOfTouches = [gesture numberOfTouches];
+    for (NSUInteger i = 0; i < numOfTouches; i++)
+    {
+        CGPoint location = [gesture locationOfTouch:i inView:self.preview];
+        CGPoint convertdLocation = [self.previewLayer convertPoint:location fromLayer:self.previewLayer.superlayer];
+        if (![self.previewLayer containsPoint:convertdLocation])
+        {
+            allTouchesAreOnThePreviewLayer = NO;
+            break;
+        }
+    }
+    if (allTouchesAreOnThePreviewLayer)
+    {
+        self.scaleNum = _preScaleNum * gesture.scale;
+        if (self.scaleNum < kMinPinchScaleNum)
+        {
+            self.scaleNum = kMinPinchScaleNum;
+        }
+        else if( self.scaleNum > kMaxPinchScaleNum)
+        {
+            self.scaleNum = kMaxPinchScaleNum;
+        }
+        [self doPinch];
+    }
     
+    if ([gesture state] == UIGestureRecognizerStateCancelled
+        ||[gesture state] == UIGestureRecognizerStateFailed
+        ||[gesture state] ==UIGestureRecognizerStateEnded
+        )
+    {
+        self.preScaleNum = self.scaleNum;
+    }
 }
 
-- (void)pinchCamerViewWithScaleNum:(CGFloat)scale
+- (void)doPinch
 {
+    AVCaptureConnection *videoConnection =  [self.stillImageOut connectionWithMediaType:AVMediaTypeVideo];
     
+    //如果大于最大的缩放因数那么就等于最大的缩放因数
+    CGFloat maxScale = videoConnection.videoMaxScaleAndCropFactor;
+    if (self.scaleNum > maxScale) {
+        self.scaleNum = maxScale;
+    }
+    
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:.025];
+    [self.previewLayer setAffineTransform:CGAffineTransformMakeScale(self.scaleNum, self.scaleNum)];
+    [CATransaction commit];
 }
 
 - (void)swithGrid:(BOOL)toShow
@@ -219,9 +278,54 @@ const CGFloat minPinchScaleNum = 1.f;
 
 - (void)focusInPoint:(CGPoint)devicePoint
 {
+    //从view坐标系转换为相机的坐标系
+    devicePoint = [self converToPointOfInterestsFromViewCoordinates:devicePoint];
     
+    [self foucsWithMode:AVCaptureFocusModeAutoFocus exposedWithMode:AVCaptureExposureModeAutoExpose
+                atPoint:devicePoint mointorSubjectAreaChange:YES];
 }
 
+- (void)foucsWithMode:(AVCaptureFocusMode)foucsMode exposedWithMode:(AVCaptureExposureMode)ExposeMode
+                                                    atPoint:(CGPoint)devicePoint
+                                                    mointorSubjectAreaChange:(BOOL)isChange
+{
+    dispatch_async(self.sessionQueue, ^{
+        AVCaptureDevice *device = [self.inputDevice device];
+        NSError *error = nil;
+        if ([device lockForConfiguration:&error])
+        {
+            if ([device isFocusPointOfInterestSupported] && [device isFocusModeSupported:foucsMode])
+            {
+                [device setFocusMode:foucsMode];
+                [device setFocusPointOfInterest:devicePoint];
+            }
+            if ([device isExposureModeSupported:ExposeMode] && [device isExposurePointOfInterestSupported])
+            {
+                [device setExposureMode:ExposeMode];
+                [device setExposurePointOfInterest:devicePoint];
+            }
+        }else
+        {
+            WYLog(@"%@",error);
+        }
+        
+    });
+}
+/**
+ *  外部的点转convert 为camera 的point
+ *
+ *  @param devicePoint 外部view的点
+ *
+ *  @return 相对位置的point
+ */
+- (CGPoint)converToPointOfInterestsFromViewCoordinates:(CGPoint)devicePoint
+{
+//    CGPoint pointOfInterest = CGPointMake(.5f, .5f);
+//    CGSize  size = self.previewLayer.bounds.size;
+    
+    
+    return CGPointZero;
+}
 
 
 

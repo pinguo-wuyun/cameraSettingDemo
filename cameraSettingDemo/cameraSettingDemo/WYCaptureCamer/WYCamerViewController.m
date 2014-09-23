@@ -15,6 +15,9 @@
 const CGFloat kCameraMenuH = 44;
 const CGFloat kCameraBtnW = 90;
 const CGFloat kButtonNum = 4;
+const CGFloat kHighAlpha = 1.0;
+const CGFloat kLowAlpha = 0.7;
+NSString * const KAdjustFoucs = @"adjustingFocus";
 
 @interface WYCamerViewController ()
 {
@@ -68,6 +71,11 @@ const CGFloat kButtonNum = 4;
     [self addBottomMenu];
     //添加照相完成时的上下遮盖
     [self addCameraCover];
+    [self addFoucView];
+    
+    //添加手势
+//    [self addPinchGesture];
+    
     
 }
 
@@ -122,8 +130,27 @@ const CGFloat kButtonNum = 4;
                  action:@selector(takeBtnClick:) parentView:self.bottomContainerView];
     [self addMenuButtons];
 }
-
-
+/**
+ *  创建按钮
+ */
+- (UIButton *)creatCamerBtn:(CGRect)btnFrame norImageStr:(NSString *)norImagStr highlightImgStr:(NSString *)higImgStr
+                  selImgStr:(NSString*)selImgStr
+                     action:(SEL)action parentView:(UIView *)parentView
+{
+    //创建button
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    
+    button.frame  = btnFrame;
+    [button setImage:[UIImage imageNamed:norImagStr] forState:UIControlStateNormal];
+    [button setImage:[UIImage imageNamed:higImgStr] forState:UIControlStateHighlighted];
+    
+    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    
+    [parentView addSubview:button];
+    
+    return button;
+    
+}
 
 - (void)addMenuButtons
 {
@@ -152,23 +179,18 @@ const CGFloat kButtonNum = 4;
     }
 }
 
-- (UIButton *)creatCamerBtn:(CGRect)btnFrame norImageStr:(NSString *)norImagStr highlightImgStr:(NSString *)higImgStr
-                                            selImgStr:(NSString*)selImgStr
-                                            action:(SEL)action parentView:(UIView *)parentView
+- (void)addFoucView
 {
-    //创建button
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"touch_focus_x.png"]];
+    imageView.alpha = 0.0;
+    [self.view addSubview:imageView];
+    self.focusImageView = imageView;
     
-    button.frame  = btnFrame;
-    [button setImage:[UIImage imageNamed:norImagStr] forState:UIControlStateNormal];
-    [button setImage:[UIImage imageNamed:higImgStr] forState:UIControlStateHighlighted];
-
-    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-    
-    [parentView addSubview:button];
-    
-    return button;
-    
+    //当聚焦直到聚焦结束
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    if (device && [device isFocusPointOfInterestSupported]) {
+        [device addObserver:self forKeyPath:KAdjustFoucs options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    }
 }
 
 /**
@@ -176,6 +198,7 @@ const CGFloat kButtonNum = 4;
  */
 - (void)takeBtnClick:(UIButton *)button
 {
+    WYLog(@"takeBtnClick");
     //首先判断用户是否支持拍照，相机是否已经损坏
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
     {
@@ -229,6 +252,14 @@ const CGFloat kButtonNum = 4;
 
 }
 
+/**添加捏合手势*/
+- (void)addPinchGesture
+{
+    UIGestureRecognizer *pinch = [[UIGestureRecognizer alloc] initWithTarget:self action:@selector(hanlePinch:)];
+    [self.view addGestureRecognizer:pinch];
+    
+    
+}
 /**
  *  调整是否显示遮盖
  *
@@ -248,6 +279,16 @@ const CGFloat kButtonNum = 4;
         downFrame.size.height = (isSHow ? screenW / 2 : 0);
         self.finshTakingDownView.frame  =downFrame;
     }];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:KAdjustFoucs]) {
+        BOOL isAdjustFoucs = [[change objectForKey:NSKeyValueChangeNewKey] isEqualToNumber:@(1)];
+        if (!isAdjustFoucs) {
+            m_alphaTimes = -1;
+        }
+    }
 }
 
 #pragma  mark ---按钮方法---
@@ -275,11 +316,42 @@ const CGFloat kButtonNum = 4;
     WYLog(@"flashBtnPressed");
 }
 
+#pragma  mark --调整镜头--
+
+- (void)hanlePinch:(UIPinchGestureRecognizer *)gesture
+{
+    [self.captureManger pinchcamerView:gesture];
+}
+
+#pragma  mark   ---手势处理方法---
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    m_alphaTimes = -1;
+    UITouch *touch = [touches anyObject];
+    m_currentPoint = [touch locationInView:self.view];
+    
+    if (CGRectContainsPoint(self.captureManger.previewLayer.frame, m_currentPoint) == NO) return;
+    
+    [self.captureManger focusInPoint:m_currentPoint];
+    
+    //对焦框
+    self.focusImageView.center = m_currentPoint;
+    self.focusImageView.transform = CGAffineTransformMakeScale(2.0, 2.0);
+    
+    //开启对焦框一直闪烁直到聚焦完成
+    [UIView animateWithDuration:0.1f animations:^{
+        self.focusImageView.alpha = 1.0f;
+        self.focusImageView.transform  = CGAffineTransformMakeScale(1.0, 1.0);
+    }];
+    
+}
 
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
 }
+
+
 
 
 @end
